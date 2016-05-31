@@ -4,6 +4,9 @@
  * to format the astyle source files in a test-data directory.
  */
 
+#include "astyle.h"
+#include "astyle_main.h"
+
 #include <stdlib.h>
 #include <string>
 #include <fstream>
@@ -13,8 +16,6 @@
 #endif
 
 using namespace std;
-
-#define ASTYLE_OPTIONS "-A1T";
 
 // allow for different calling conventions in Linux and Windows
 #ifdef _WIN32
@@ -31,7 +32,6 @@ extern "C" char* STDCALL AStyleMain(const char* sourceIn,
 void  STDCALL ASErrorHandler(int errorNumber, const char* errorMessage);
 char* STDCALL ASMemoryAlloc(unsigned long memoryNeeded);
 
-
 // Error handler for the Artistic Style formatter.
 void  STDCALL ASErrorHandler(int errorNumber, const char* errorMessage)
 {   cout << "astyle error " << errorNumber << "\n"
@@ -45,15 +45,13 @@ char* STDCALL ASMemoryAlloc(unsigned long memoryNeeded)
     return buffer;
 }
 
-// Formatting function
-extern "C" char* js_format_string(char* textIn)
+// Exposed formatting function
+extern "C" char* js_format_string(char *textIn)
 {
-    const char* options = ASTYLE_OPTIONS;
-
-    char* textOut = AStyleMain(textIn,
-                               options,
+    char *formattedText = AStyleMain(textIn,
+                               "-A1tpS",
                                ASErrorHandler,
                                ASMemoryAlloc);
 
-    return textOut;
+    return formattedText;
 }

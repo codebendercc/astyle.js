@@ -7,7 +7,6 @@ ASTYLE_JS="astyle.js"
 
 build() {
     FILES=(
-        js_format_string.cpp
         astyle_main.cpp
         ASBeautifier.cpp
         ASFormatter.cpp
@@ -19,22 +18,26 @@ build() {
     LDFLAGS="-O3"
 
     echo "Building: ${OUTPUT_FILE}"
-    emcc --memory-init-file 0 -DASTYLE_LIB ${LDFLAGS} ${FILES[@]} -o ${OUTPUT_FILE} -s EXPORTED_FUNCTIONS='["_js_format_string"]'
+    # -DASTYLE_LIB
+    emcc --memory-init-file 0 -s TOTAL_MEMORY=536870912 -s EXPORTED_FUNCTIONS='["_js_format_string"]' ${LDFLAGS} ${FILES[@]} -o ${OUTPUT_FILE}
 }
 
 mkdir -p build/
 cd build/
-curl -L -o ${ASTYLE_ARCHIVE} ${ASTYLE_DOWNLOAD_URL}
-tar xvf ${ASTYLE_ARCHIVE}
-cp -v ../src/${ASTYLE_IMPLEMENTATION} astyle/src
+# wget -c -O ${ASTYLE_ARCHIVE} ${ASTYLE_DOWNLOAD_URL}
+# tar xvf ${ASTYLE_ARCHIVE}
+# cp -v ../src/${ASTYLE_IMPLEMENTATION} astyle/src
 
 cd astyle/src
 build
+RETVAL=$?
 cd -
 cd ..
 
-mkdir -p dist/
-cp -v build/astyle/src/${ASTYLE_JS} dist/
+if [[ $RETVAL -eq 0 ]]; then
+    mkdir -p dist/
+    cp -v build/astyle/src/${ASTYLE_JS} dist/
 
-echo ""
-echo "Thats all folks! Look for the produced file at dist/ directory."
+    echo ""
+    echo "Thats all folks! Look for the produced file at dist/ directory."
+fi
